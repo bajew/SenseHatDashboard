@@ -1,0 +1,37 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+@using SenseHatDashboard.Shared;
+@inject NavigationManager NavigationManager
+
+<span>Connected: @IsConnected</span>
+
+<ul id="messagesList">
+        @foreach (var message in _messages)
+    {
+        <li>@message</li>
+    }
+</ul>
+
+
+@code {
+    private HubConnection _hubConnection;
+    private List<string> _messages = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/hubs/sensehat"))
+            .Build();
+
+        _hubConnection.On<SensorData>("PublishSensorReadings", ( readings) =>
+        {
+            _messages.Add(readings.ToString());
+            StateHasChanged();
+        });
+
+        await _hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        _hubConnection.State == HubConnectionState.Connected;
+}
