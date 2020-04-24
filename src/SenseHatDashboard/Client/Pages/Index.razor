@@ -2,15 +2,22 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @using SenseHatDashboard.Shared;
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime;
 
 <span>Connected: @IsConnected</span>
 
-<ul id="messagesList">
-        @foreach (var message in _messages)
-    {
-        <li>@message</li>
-    }
-</ul>
+<div class="scrollable">
+    <ul id="messagesList">
+            @foreach (var message in _messages)
+        {
+            <li>@message</li>
+        }
+    </ul>
+</div>
+
+<div id="chart">
+
+</div>
 
 
 @code {
@@ -23,13 +30,15 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/hubs/sensehat"))
             .Build();
 
-        _hubConnection.On<SensorData>("PublishSensorReadings", ( readings) =>
+        _hubConnection.On<SensorData>("PublishSensorReadings", (readings) =>
         {
             _messages.Add(readings.ToString());
             StateHasChanged();
         });
 
         await _hubConnection.StartAsync();
+
+        await JSRuntime.InvokeVoidAsync("generateChart");
     }
 
     public bool IsConnected =>
