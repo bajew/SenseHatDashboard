@@ -1,15 +1,10 @@
 using SenseHatDashboard.Server.Hubs;
 using SenseHatDashboard.Server.Services;
-using SenseHatDashboard.Shared;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
 
 namespace SenseHatDashboard.Server
 {
@@ -26,11 +21,21 @@ namespace SenseHatDashboard.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var senseHatServiceToUse = Configuration["SenseHat:Service"];
 
             services.AddControllersWithViews();
             services.AddSignalR();
             services.AddSingleton<ISenseHatHub, SenseHatHub>();
-            services.AddSingleton<ISenseHatServices, SenseHatServices>();
+
+            if (senseHatServiceToUse == "Simulation")
+            {
+                services.AddSingleton<ISenseHatServices, SenseHatSimulationServices>();
+            }
+            else
+            {
+                services.AddSingleton<ISenseHatServices, SenseHatServices>();
+            }
+
             services.AddHostedService<SenseHatBroadcasterService>();
         }
 

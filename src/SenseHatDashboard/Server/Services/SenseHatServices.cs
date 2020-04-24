@@ -7,6 +7,7 @@ namespace SenseHatDashboard.Server.Services
 {
     public class SenseHatServices:ISenseHatServices
     {
+        
         public SensorReadings SensorReadings => GetReadings();
 
         private readonly SenseHatLedMatrix ledMatrix;
@@ -17,6 +18,7 @@ namespace SenseHatDashboard.Server.Services
 
         private readonly CpuTemperature temperatureCpuSensor;
 
+
         public SenseHatServices()
         {
             ledMatrix = new SenseHatLedMatrixI2c();
@@ -25,7 +27,7 @@ namespace SenseHatDashboard.Server.Services
             temperatureCpuSensor = new CpuTemperature();
         }
 
-        public SensorReadings GetReadings()
+        private SensorReadings GetReadings()
         {
             var tempHum =  temperatureAndHumiditySensor.Temperature;
             var tempPress = pressureAndTemperatureSensor.Temperature;

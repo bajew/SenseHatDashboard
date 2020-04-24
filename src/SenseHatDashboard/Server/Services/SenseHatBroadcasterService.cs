@@ -30,7 +30,7 @@ namespace SenseHatDashboard.Server.Services
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var readings = _SenseHatServices.GetReadings();
+                    var readings = _SenseHatServices.SensorReadings;
                     _Logger.LogInformation(readings.ToString());
                     await _HubContext.Clients.All.PublishSensorReadings(readings.ToSensorData());
                     await Task.Delay(1000, stoppingToken);
